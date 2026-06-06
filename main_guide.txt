@@ -23,6 +23,7 @@ def main function
 # parser.add_argument(--all..) a convenience flag that runs all modules at once instead of specifying each one individually
 # args.sqli or args.all runs the SQLi module if either --sqli or --all was passed, similarily for fuzzer and brute force
 # sqli_url =f"... builds the specific DVWA page URL for each module, each vulnerability in DVWA has its own URL path
+# we create a new session for brute force attack since the state of the session is being changed by the previous modules(best practice is to create a new session for each module)
 # results = brute_force... brute force returns a single result(one set of creds or None) rather than a list so we handle it diff
     findings["brute_force"] = [result] if result else []
     wrapping the result in a list if found, or stores an empty list if nothing was fnd, keeps the format consistent with other modules

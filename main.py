@@ -55,7 +55,8 @@ def main():
     if args.brute or args.all:
         from modules.brute_force import brute_force
         brute_url = f"{args.target}/vulnerabilities/brute/"
-        result = brute_force(brute_url, args.username, "wordlists/common_passwords.txt", session=session)
+        brute_session = get_session(args.target, args.username, args.password)
+        result = brute_force(brute_url, args.username, "wordlists/common_passwords.txt", session=brute_session)
         findings["brute_force"] = [result] if result else []
 
     print_summary(findings)

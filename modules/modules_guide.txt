@@ -63,8 +63,10 @@ BRUTE_FORCE.PY
 def brute_force function
 # url(login page to attack), username(the username to try pwds against), wordlist_path(path to our pwd list), session(optional authenticated sesh)
 # rets either a dict with the found credentials or none
+# requester = session... bcoz brute force requires an auth session
 
-# response = requester.post... sends a POST req simulating a login form submission, the data dict matches the form fields DVWA expects: username field, pwd field, login submit btn value
+# response = requester.get... sends a GET req simulating a login form submission, the params dict matches the form fields DVWA expects: username field, pwd field, login submit btn value
+    we were sending a post req with data in the body but we needed to send GET req with params instead
 # allow redirects since unlike the fuzzer we want to follow redirects, after a successful login, most apps redirect to the dashboard pg
 # if welcome or logout in body is how we detect a successful login(every login form has a success indicator, in a real tool we must make it configurable)
 # returns the found credentials as a dictionary so main.py can display and save them
