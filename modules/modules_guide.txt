@@ -1,0 +1,77 @@
+SQLI_TESTER.PY
+#requests is a python lib for making http reqs, how our tool will talk to the DVWA, sending GET n POST reqs just like a browser would do but programmatically
+#Colorama makes terminal colors work cross-platform, Fore controls text-color, Style controls formatting like bold and reset 
+
+#colorama.init initializes it, required on windows/WSL2 for colors to work properly in the terminal
+
+#PAYLOADS a list of SQL injection payloads we'll fire at the target one by one
+
+#ERROR_SIGN a list of str that appear in the HTTP response when a SQL error occurs, when the website is vulnerable to SQLi, the database often leaks err messages into the page, we search for these to confirm a vulnerability
+
+def test_sqli function
+# url(target url), param(query param to inject), session(optional requests session object, useful for authenticated reqs(when u need to be logged in first))
+# we use a baseline request to find what a normal request looks like   
+    added submit btn info to the request
+# requester = ... so if a sessn was passed in, use it or use plain reqs library (a or b returns a if it's truthful, otherwise b)
+# response = ... sends a GET req with the payload injected into the params
+    url = "http://localhost/dvwa/vulnerabilities/sqli/"
+    param = "id"                                        ----->      GET http://localhost/dvwa/vulnerabilities/sqli/?id=' OR '1'='1
+    payload = "' OR '1'='1"
+    added submit button info to the request
+# body = response.te... gets the full HTML response as lowercase txt, lowercase makes our sign matching case-insensitive w/o need regex
+# we compare the sizes of the baseline and each request
+# for sig in ERROR_SIGN: ... checks if any of the err signs appear in the response, if yes, the site leaks SQL errs - confirming vulnerability
+# else -> on a for loop (in Python) that runs only if the loop completed w/o breaking, thus only runs when no err signs found
+# using 200 bytes as threshold, if size diff is greater then it suggests extra data was added
+# requests.exceptions.RequestException -> catches any n/w err, connectn refused, timeout, DNS failures, etc - so tool doesn't crash if the target is unreachable
+
+# Output :
+[*] Testing http://localhost/dvwa/... for SQL Injection on param: id
+
+[VULNERABLE] Payload: ' OR '1'='1
+  Evidence: sql syntax
+[POSSIBLE]   Payload: ' UNION SELECT user, password FROM users-- - — large response (3420 bytes)
+[SAFE]       Payload: 1' ORDER BY 3-- -
+
+
+
+
+DIR_FUZZER.PY
+# web servers have hidden paths that aren't linked anywhere- admin panels, config/backup files, old pages. Directory fuzzing systematically tests hundreds of common paths to discover what's actually there
+    for eg. /admin          → 403 (exists but protected)
+            /backup         → 200 (oops, publicly accessible)
+            /config.php.bak → 200 (developer left a backup file)
+
+def load_wordlist function:
+# reads a wrdlist file and rets it as a list of strs, each line in the file is one path to test 
+# return [line.strip...] is a list comprehension that loops thru every line in the file, (.strip()) removes whitespaces n newlines from each line & (if line.strip()) skips empty lines
+
+def fuzz_dirs(...) function
+# main fuzzing function where base_url(the target), wordlist_path(path to our wordlist file), session(optional authenticated sesh, same pattern as SQLI_TESTER)
+#url = ... builds the full URL by combining the base URL w/ each path from the wordlist_path
+response = requester... sends a GET request to the URL, allow_directs=False is imp since w/o it, reqs would auto follow redirect & we'd miss 301/302 responses which r useful findings
+# HTTP status codes :
+    200 - page exists & loaded successfully -> FOUND 
+    301/302 - page exists but redirects smewhere else -> REDIRECT (still interesting)
+    403 - page exists but access is denied -> FORBIDDEN (very interesting, means something is protected)
+    404 - page doesn't exist -> not FOUND, move on
+
+
+
+
+BRUTE_FORCE.PY
+def brute_force function
+# url(login page to attack), username(the username to try pwds against), wordlist_path(path to our pwd list), session(optional authenticated sesh)
+# rets either a dict with the found credentials or none
+
+# response = requester.post... sends a POST req simulating a login form submission, the data dict matches the form fields DVWA expects: username field, pwd field, login submit btn value
+# allow redirects since unlike the fuzzer we want to follow redirects, after a successful login, most apps redirect to the dashboard pg
+# if welcome or logout in body is how we detect a successful login(every login form has a success indicator, in a real tool we must make it configurable)
+# returns the found credentials as a dictionary so main.py can display and save them
+# return none if no pwd worked
+# example :
+    Try admin:password    → failed
+    Try admin:123456      → failed
+    Try admin:admin       → failed
+    Try admin:letmein     → SUCCESS → return credentials
+    

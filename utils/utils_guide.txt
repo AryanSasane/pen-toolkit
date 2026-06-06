@@ -1,0 +1,13 @@
+REPORTER.PY
+#simpler than the analyzer reporter bcoz findings from diff modules have diff structures, instead of forcing everythin into one format, we store each module's raw o/p under its own key
+
+def save_report function
+# takes a dict of all findings from every module and saves them to a JSON file
+# if isinstance(v, list) only counts values that are lists, skips strings like "target"
+# so if SQLI found 3 issues and the fuzzer found 5 paths, total is 8
+
+def print_summary function
+# prints a clear summary table to the terminal
+# for key, value in findin... loops through every key-value pair in the findings dict, .items() ret both key n value together
+# if isinstance(val, list)... only prints modules that actually fnd something, skips empty results and non-list values like "target"
+# f"  {key:<30}..." same left-aligned formatting that pads the keys to 30 chars so everything lines up neatly

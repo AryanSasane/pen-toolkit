@@ -1,0 +1,29 @@
+Big Picture
+main.py
+    ↓
+get_session() — logs into DVWA
+    ↓
+sqli_tester.py  — tests for SQL injection
+dir_fuzzer.py   — discovers hidden paths  
+brute_force.py  — cracks login credentials
+    ↓
+reporter.py — saves everything to JSON
+
+def get_session function
+# most imp fn, DVWA reqs login, this fn logs in & rets an authenticated session 
+# session = reques... creates a new session object, kinda like opening a browser, all reqs made through this sesh share the same cookies
+# response = session... first we GET the login page before posting creds, necessary coz DVWA uses CSRF token, a hidden sec field that must be included with the login form
+# if "user_token" in response.text... checks if the page has a CSRF token, DVWA includes a hidden field called "user_token" to prevent automated logins, we need to extract it & include it in our POST reqs
+# match = re.search... uses regex to find & extract the token val from the HTML, the pattern looks for user_token' value='...' & captures whats in the quotes
+# token = match.group(1) extracts the captured group - the actual group value
+# session.post... posts the login form with the creds and the CSRF token, after the sesh is auth, all subsequents reqs will be logged in
+
+def main function
+# parser.add_argument(--target..)...required=True means this arg must always be be provided, the tool can't run w/o a target, all other args r optionA
+# parser.add_argument(--all..) a convenience flag that runs all modules at once instead of specifying each one individually
+# args.sqli or args.all runs the SQLi module if either --sqli or --all was passed, similarily for fuzzer and brute force
+# sqli_url =f"... builds the specific DVWA page URL for each module, each vulnerability in DVWA has its own URL path
+# results = brute_force... brute force returns a single result(one set of creds or None) rather than a list so we handle it diff
+    findings["brute_force"] = [result] if result else []
+    wrapping the result in a list if found, or stores an empty list if nothing was fnd, keeps the format consistent with other modules
+
